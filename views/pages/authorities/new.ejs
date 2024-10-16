@@ -1,0 +1,114 @@
+<%- include('../../partials/header') %>
+<section class="light-grey new-project padded">
+    <style>
+        .longText {
+            min-width: 80%;
+        }
+        .submit {
+            margin-top: 2em;
+        }
+        .padded {
+            padding: 2em;
+        }
+    </style>
+    <h1 id="newAuthorityTitle"><%= typeof authorityId !== 'undefined' ? 'Edit Authority' : 'New Authority' %></h1>
+    <div id="res" class="alert"></div>
+    <form id="dataForm"></form>
+
+    <script>
+        // Grab authority ID from the server-rendered template variable, if available
+        const authorityId = "<%= typeof authorityId !== 'undefined' ? authorityId : '' %>";
+        let data = {}; // Initialize as empty
+
+        $('#dataForm').html("");
+        $('#res').html("");
+        $('form').show();
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Check if authorityId exists, fetch data if it does
+            if (authorityId) {
+                fetch(`/authorities/${authorityId}`, {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(authorityData => {
+                        data = authorityData;  // Set the fetched data
+
+                        // Fetch the schema and render the form with the fetched data
+                        fetch('/schemas/authority.json')
+                            .then(response => response.json())
+                            .then(schema => {
+                                renderForm(schema, data);
+                            });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching authority data:', error);
+                        $('#res').html('<p>Error loading authority data.</p>');
+                    });
+            } else {
+                // If no authorityId, load an empty form for creating a new authority
+                fetch('/schemas/authority.json')
+                    .then(response => response.json())
+                    .then(schema => {
+                        renderForm(schema, data);  // Empty data for new authority
+                    });
+            }
+        });
+
+        function renderForm(schema, formData) {
+            // Render the form with the provided schema and data
+            $('#dataForm').jsonForm({
+                schema: schema.schema,
+                form: schema.form,
+                value: formData,  // Use the fetched data to populate the form
+                onSubmit: function (errors, values) {
+                    submitProjectForm(errors, values);
+                }
+            });
+        }
+
+        function submitProjectForm(errors, values) {
+            if (errors) {
+                const errorsObj = JSON.stringify(errors);
+                $('#res').html('<p>Please correct the errors in your form</p>' +  errorsObj);
+            } else {
+                // Disable the submit button
+                $('.submit').prop('disabled', true);
+                $('#res').html('<p>Submitting, please wait...</p>');
+
+                // Determine whether it's an add or edit operation
+                const postUrl = authorityId ? `/authorities/${authorityId}` : '/authorities';
+                const method = authorityId ? 'PUT' : 'POST';
+
+                // Post the data to the appropriate URL
+                fetch(postUrl, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(values)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data._id) {
+                        // Re-enable the submit button
+                        $('.submit').prop('disabled', false);
+                        $('#res').html(`<p>Successfully ${method === 'PUT' ? 'updated' : 'created'} authority with ID: ${data._id}</p>`);
+                        window.location.href = `/authorities/`;
+                    } else if (data.error) {
+                        $('#res').html(`<p>Error: ${data.error}</p>`);
+                    } else {
+                        $('#res').html('<p>Unknown error occurred</p>');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    $('#res').html('<p>An error occurred while processing your request</p>');
+                });
+            }
+        }
+    </script>
+</section>
+<%- include('../../partials/footer') %>

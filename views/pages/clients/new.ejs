@@ -1,0 +1,137 @@
+<%- include('../../partials/header') %>
+<section class="light-grey new-project padded">
+    <style>
+        .longText input {
+            min-width: 80%;
+        }
+        .submit {
+            margin-top: 2em;
+        }
+        .padded {
+            padding: 2em;
+        }
+    </style>
+    <h1 id="newClientTitle"><%= typeof clientId !== 'undefined' ? 'Edit Client' : 'New Client' %></h1>
+    <div id="res" class="alert"></div>
+    <form id="dataForm"></form>
+
+    <script>
+        // Grab client ID from the server-rendered template variable, if available
+        const clientId = "<%= typeof clientId !== 'undefined' ? clientId : '' %>";
+        let data = {}; // Initialize as empty
+
+        $('#dataForm').html("");
+        $('#res').html("");
+        $('form').show();
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Fetch authorities first
+            fetch('/authorities', {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(authorities => {
+                // Format authorities for enum (name concatenated with id)
+                const authorityEnum = authorities.map(auth => `${auth.name} (${auth._id})`);
+
+                // Fetch the client data if editing (i.e., if clientId exists)
+                if (clientId) {
+                    fetch(`/clients/${clientId}`, {
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(clientData => {
+                            data = clientData;  // Set the fetched client data
+                            // Fetch and update the schema with authority enum
+                            updateSchemaWithAuthorities(authorityEnum, data);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching client data:', error);
+                            $('#res').html('<p>Error loading client data.</p>');
+                        });
+                } else {
+                    // If no clientId, load an empty form for creating a new client
+                    updateSchemaWithAuthorities(authorityEnum, data);  // Empty data for new client
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching authorities:', error);
+                $('#res').html('<p>Error loading authorities.</p>');
+            });
+        });
+
+        function updateSchemaWithAuthorities(authorityEnum, formData) {
+            // Fetch the client schema and update the "authority" enum with authority names and ids
+            fetch('/schemas/client.json')
+                .then(response => response.json())
+                .then(schema => {
+                    // Update the schema enum for "authority"
+                    schema.schema.properties.authority.enum = authorityEnum;
+                    renderForm(schema, formData);
+                });
+        }
+
+        function renderForm(schema, formData) {
+            // Render the form with the provided schema and data
+            $('#dataForm').jsonForm({
+                schema: schema.schema,
+                form: schema.form,
+                value: formData,  // Use the fetched data to populate the form
+                onSubmit: function (errors, values) {
+                    if (values.authority) {
+                        // Extract authority ID from the concatenated string (e.g., "auth 1 (id)")
+                        const authorityId = values.authority.match(/\(([^)]+)\)$/)[1];
+                        values.authority = authorityId;  // Replace with just the ID
+                    }
+                    submitClientForm(errors, values);
+                }
+            });
+        }
+
+        function submitClientForm(errors, values) {
+            if (errors) {
+                const errorsObj = JSON.stringify(errors);
+                $('#res').html('<p>Please correct the errors in your form</p>' +  errorsObj);
+            } else {
+                // Disable the submit button
+                $('.submit').prop('disabled', true);
+                $('#res').html('<p>Submitting, please wait...</p>');
+
+                // Determine whether it's an add or edit operation
+                const postUrl = clientId ? `/clients/${clientId}` : '/clients';
+                const method = clientId ? 'PUT' : 'POST';
+
+                // Post the data to the appropriate URL
+                fetch(postUrl, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(values)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data._id) {
+                        // Re-enable the submit button
+                        $('.submit').prop('disabled', false);
+                        $('#res').html(`<p>Successfully ${method === 'PUT' ? 'updated' : 'created'} client with ID: ${data._id}</p>`);
+                        window.location.href = `/clients/`;
+                    } else if (data.error) {
+                        $('#res').html(`<p>Error: ${data.error}</p>`);
+                    } else {
+                        $('#res').html('<p>Unknown error occurred</p>');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    $('#res').html('<p>An error occurred while processing your request</p>');
+                });
+            }
+        }
+    </script>
+</section>
+<%- include('../../partials/footer') %>

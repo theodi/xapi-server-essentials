@@ -1,0 +1,17 @@
+{
+    "schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "required": true
+        },
+        "email": {
+          "type": "string",
+          "title": "Email",
+          "required": true
+        }
+      }
+    }
+}

@@ -1,0 +1,164 @@
+ALL REQUESTS MUST COME FROM AN ALLOWED ORIRIN
+
+POST /statements
+
+{"actor":{"objectType":"Agent","name":"1ca4145b-5386-4904-8cd6-7d6a7097ee7d","account":{"homePage":"http://.learndata.info","name":"1ca4145b-5386-4904-8cd6-7d6a7097ee7d"}},"verb":{"id":"http://adlnet.gov/expapi/verbs/launched","display":{"en-US":"launched"}},"object":{"objectType":"Activity","id":"https://data-ethics-essentials.learndata.info/m2-what-is-data-ethics","definition":{"type":"http://adlnet.gov/expapi/activities/course","name":{"en":"What is Data ethics?"},"description":{"en":""}}},"result":{"duration":"PT0S"},"id":"c671e74b-e458-46ba-95d5-56666feea87d"}
+
+Response (JSON) : ["c671e74b-e458-46ba-95d5-56666feea87d"] (the id)
+
+OPTIONS /statements
+
+GET,HEAD,PUT,POST
+
+
+STATE
+
+GET https://theodi.learninglocker.net/data/xAPI/activities/state?activityId=https%3A%2F%2Fdata-ethics-essentials.learndata.info%2Fm2-what-is-data-ethics&agent=%7B%22objectType%22%3A%22Agent%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%2C%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2F.learndata.info%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%7D%7D&stateId=course
+
+GET https://theodi.learninglocker.net/data/xAPI/activities/state?activityId=https%3A%2F%2Fdata-ethics-essentials.learndata.info%2Fm2-what-is-data-ethics&agent=%7B%22objectType%22%3A%22Agent%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%2C%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2F.learndata.info%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%7D%7D&stateId=contentObjects
+
+https://theodi.learninglocker.net/data/xAPI/activities/state?activityId=https%3A%2F%2Fdata-ethics-essentials.learndata.info%2Fm2-what-is-data-ethics&agent=%7B%22objectType%22%3A%22Agent%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%2C%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2F.learndata.info%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%7D%7D&stateId=articles
+
+https://theodi.learninglocker.net/data/xAPI/activities/state?activityId=https%3A%2F%2Fdata-ethics-essentials.learndata.info%2Fm2-what-is-data-ethics&agent=%7B%22objectType%22%3A%22Agent%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%2C%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2F.learndata.info%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%7D%7D&stateId=blocks
+
+https://theodi.learninglocker.net/data/xAPI/activities/state?activityId=https%3A%2F%2Fdata-ethics-essentials.learndata.info%2Fm2-what-is-data-ethics&agent=%7B%22objectType%22%3A%22Agent%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%2C%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2F.learndata.info%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%7D%7D&stateId=components
+
+https://theodi.learninglocker.net/data/xAPI/activities/state?activityId=https%3A%2F%2Fdata-ethics-essentials.learndata.info%2Fm2-what-is-data-ethics&agent=%7B%22objectType%22%3A%22Agent%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%2C%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2F.learndata.info%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%7D%7D&stateId=offlineStorage
+
+Response (JSON) : {"errorId":"cdb18a66-65eb-42ce-9990-2ae67e62e630","message":"No State found"}
+
+OPTIONS /state
+
+DELETE,GET,HEAD,PUT,POST
+
+POST https://theodi.learninglocker.net/data/xAPI/activities/state?activityId=https%3A%2F%2Fdata-ethics-essentials.learndata.info%2Fm2-what-is-data-ethics&agent=%7B%22objectType%22%3A%22Agent%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%2C%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2F.learndata.info%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%7D%7D&stateId=course
+
+BODY: {"_id":"course","_isComplete":false,"_isInteractionComplete":false,"_isVisited":true}
+
+RESPONSE: 204 (empty)
+
+POST https://theodi.learninglocker.net/data/xAPI/activities/state?activityId=https%3A%2F%2Fdata-ethics-essentials.learndata.info%2Fm2-what-is-data-ethics&agent=%7B%22objectType%22%3A%22Agent%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%2C%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2F.learndata.info%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%7D%7D&stateId=contentObjects
+
+BODY: [{"_id":"64f04f900667765a0b978c97","_isComplete":false,"_isInteractionComplete":false,"_isVisited":true}]
+
+RESPONSE: 204 (empty)
+
+PUT https://theodi.learninglocker.net/data/xAPI/activities/state?activityId=https%3A%2F%2Fdata-ethics-essentials.learndata.info%2Fm2-what-is-data-ethics&agent=%7B%22objectType%22%3A%22Agent%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%2C%22account%22%3A%7B%22homePage%22%3A%22http%3A%2F%2F.learndata.info%22%2C%22name%22%3A%221ca4145b-5386-4904-8cd6-7d6a7097ee7d%22%7D%7D&stateId=articles
+
+BODY: [{"_id":"64f04f900667765a0b978c9a","_isComplete":false,"_isInteractionComplete":false,"_isVisited":true}] <- IS AN ARRAY!
+
+RESPONSE: 204 (empty)
+
+ADAPT DOES NOT DO A GET ON STATEMENT. IT DOES A GET ON STATE. SO STATEMENTS ARE POST/PUT only
+
+When a statement is POSTED WE CAN DO WHAT WE LIKE WITH IT AT THE LRS
+
+{
+    "actor": {
+        "objectType": "Agent",
+        "name": "1ca4145b-5386-4904-8cd6-7d6a7097ee7d",
+        "account": {
+            "homePage": "http://.learndata.info",
+            "name": "1ca4145b-5386-4904-8cd6-7d6a7097ee7d"
+        }
+    },
+    "verb": {
+        "id": "http://adlnet.gov/expapi/verbs/launched",
+        "display": {
+            "en-US": "launched"
+        }
+    },
+    "object": {
+        "objectType": "Activity",
+        "id": "https://data-ethics-essentials.learndata.info/m2-what-is-data-ethics",
+        "definition": {
+            "type": "http://adlnet.gov/expapi/activities/course",
+            "name": {
+                "en": "What is Data ethics?"
+            },
+            "description": {
+                "en": ""
+            }
+        }
+    },
+    "result": {
+        "duration": "PT0S"
+    },
+    "id": "1f4d15fc-1a38-4776-96cd-1f05c8fb87d7"
+}
+
+Becomes
+
+{
+  "stored": "2024-10-16T06:50:57.059Z", <- Date stored
+  "client": "65087833982d41db6bd67349", <- From the API Key
+  "activities": [
+    "https://data-ethics-essentials.learndata.info/m2-what-is-data-ethics" <- The main object ID
+  ],
+  "agents": [
+    "http://.learndata.info|1ca4145b-5386-4904-8cd6-7d6a7097ee7d" <-homepage + | + name
+  ],
+  "statement": {
+    "authority": {
+      "objectType": "Agent",
+      "name": "The Open Data Institute",
+      "mbox": "mailto:training@theodi.org"
+    }, <- Owner of the API key
+    "stored": "2024-10-16T06:50:57.059Z", <- Date stored
+    "actor": {
+      "objectType": "Agent",
+      "name": "1ca4145b-5386-4904-8cd6-7d6a7097ee7d",
+      "account": {
+        "homePage": "http://.learndata.info",
+        "name": "1ca4145b-5386-4904-8cd6-7d6a7097ee7d"
+      }
+    }, <- From the statement
+    "timestamp": "2024-10-16T06:50:57.059Z", <- Data stored
+    "version": "1.0.0", <- Statement version?
+    "id": "1f4d15fc-1a38-4776-96cd-1f05c8fb87d7",
+    "result": {
+      "duration": "PT0S"
+    },
+    "verb": {
+      "id": "http://adlnet.gov/expapi/verbs/launched",
+      "display": {
+        "en-US": "launched"
+      }
+    },
+    "object": {
+      "objectType": "Activity",
+      "id": "https://data-ethics-essentials.learndata.info/m2-what-is-data-ethics",
+      "definition": {
+        "type": "http://adlnet.gov/expapi/activities/course",
+        "name": {
+          "en": "What is Data ethics?"
+        },
+        "description": {
+          "en": ""
+        }
+      }
+    }
+  },
+  "metadata": {
+    "https://learninglocker.net/result-duration": {
+      "seconds": 0
+    }
+  },
+  "verbs": [
+    "http://adlnet.gov/expapi/verbs/launched"
+  ], <- "Extracted from the verb in the statement"
+  "person": {
+    "_id": "670f5bd6354a17b4d7b3b2de",
+    "display": "1ca4145b-5386-4904-8cd6-7d6a7097ee7d"
+  }, <- A record in the person collection where the display has been stored?
+  "timestamp": "2024-10-16T06:50:57.059Z", <- Stored data
+  "relatedActivities": [
+    "https://data-ethics-essentials.learndata.info/m2-what-is-data-ethics"
+  ], <- id from Object and ids from content.contextActivities.grouping (which is an array of objects with ids)
+  "relatedAgents": [
+    "http://.learndata.info|1ca4145b-5386-4904-8cd6-7d6a7097ee7d", <-user compound
+    "mailto:training@theodi.org" <- email from key
+  ],
+  "organisation": "61bc8308a80e042fbaefc92e", <- organisation id from key
+  "_id": "670f6251bfac5963bc64a812", <- id of statement
+}

@@ -1,0 +1,72 @@
+{
+    "schema": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "required": true
+        },
+        "authority": {
+          "type": "string",
+          "title": "Authority",
+          "enum": ["auth 1 (id)", "auth 2 (id)"],
+          "required": true
+        },
+        "origin": {
+          "type": "string",
+          "title": "Origin URL",
+          "required": true
+        },
+        "key": {
+          "type": "string",
+          "title": "Key"
+        },
+        "secret": {
+          "type": "string",
+          "title": "Secret"
+        },
+        "basicAuth": {
+          "type": "string",
+          "title": "Basic Auth"
+        },
+        "isDisabled": {
+          "type": "boolean",
+          "title": "Disabled"
+        }
+      }
+    },
+    "form": [
+      {
+        "key": "title"
+      },
+      {
+        "key": "authority"
+      },
+      {
+        "key": "origin",
+        "htmlClass": "longText"
+      },
+      {
+        "key": "key",
+        "htmlClass": "longText"
+      },
+      {
+        "key": "secret",
+        "htmlClass": "longText"
+      },
+      {
+        "key": "basicAuth",
+        "type": "textarea",
+        "htmlClass": "textArea"
+      },
+      {
+        "key": "isDisabled"
+      },
+      {
+        "type": "submit",
+        "title": "Submit",
+        "htmlClass": "submit"
+      }
+    ]
+}
