@@ -78,6 +78,8 @@ You can configure the server via the `.env` file:
 - **MONGO_DB**: MongoDB database name.
 - **SESSION_SECRET**: Secret key for sessions.
 
+You can then access your instance and configure authorities (organisations) and client keys for the differnt clients (eLearning deployments). You should use a different client key per "course".
+
 ## Security Considerations
 
 The server includes multiple layers of security to protect against unauthorized access:
@@ -88,8 +90,7 @@ The server includes multiple layers of security to protect against unauthorized 
 ## Roadmap
 
 - **Improved Logging**: Add detailed logs for tracking request/response flow.
-- **Admin Dashboard**: Add a UI for managing clients and viewing system health.
-- **Additional Security Features**: Implement rate-limiting and IP whitelisting.
+- **Basic dashboards**: Add basic dashboards of key information for each "course".
 
 ## Contributing
 
