@@ -1,124 +1,100 @@
-# ODI Maturity Assessment Tool
+# xAPI-Server-Essentials
 
-The **ODI Maturity Assessment Tool** is a web-based application designed to help organisations assess their maturity across various data-related domains. The tool currently includes the **Open Data Maturity Model** assessment, with upcoming models including the **Data Ethics Maturity Model** and the **Data Practices Maturity Assessment**.
+xAPI-Server-Essentials is a lightweight, xAPI server designed to handle xAPI statements and state data for eLearning platforms such as Adapt Learning’s xAPI plugin. The project provides similar functionality to Learning Locker but with added security constraints. These constraints prevent clients from accessing personal data or statements, protecting against potential misuse of client keys to obtain sensitive information.
 
-## Table of Contents
+The server is written in Node.js with Express, MongoDB for persistence, and Mongoose for data modeling.
 
-- [Overview](#overview)
-- [Features](#features)
-- [AI-Powered Summaries](#ai-powered-summaries)
-- [Available Assessments](#available-assessments)
-- [Installation](#installation)
-- [Running the Application](#running-the-application)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+## Key Features
 
-## Overview
+- **xAPI Statement Support**: Handles xAPI statement submissions but restricts clients from retrieving statements, ensuring that no personal data can be accessed via API calls.
+- **xAPI State Management**: Provides endpoints to store and retrieve the state data for a particular learning activity or agent.
+- **Client-Level Permissions**: Hardcoded limitations on what operations a client can perform. Clients can store and retrieve state data but are restricted from accessing xAPI statements.
+- **Secure Client Authentication**: Uses Basic Auth and API keys for client authentication, with an additional layer of security that checks for matching origins.
+- **Protection Against Data Harvesting**: The inability to retrieve statements protects against attacks where client keys could be misused to access sensitive information.
 
-The ODI Maturity Assessment Tool is designed to support organisations in understanding their current capabilities in managing and utilising data. By using this tool, organisations can assess their maturity levels, identify areas for improvement, and track progress over time.
+## Comparison to Learning Locker
 
-## Features
+While xAPI-Server-Essentials provides much of the same functionality as Learning Locker for state and statement handling, the key distinction is in its security model. Learning Locker provides more flexibility in data retrieval, but xAPI-Server-Essentials takes a more restrictive approach to protect user data, making it ideal for use cases where security and privacy are top priorities.
 
-- **Interactive Assessments**: Users can interact with assessments to evaluate their organisation's maturity.
-- **Progress Tracking**: Track progress over time and view historical assessments.
-- **Detailed Reporting**: Generate detailed reports that summarise the assessment results and provide actionable insights.
-- **AI-Powered Summaries**: Automatically generate human-readable summaries for each activity, dimension, and an executive overview using advanced AI capabilities.
-- **Customisable Assessments**: Upcoming features will allow for more customisation in assessments and evaluation criteria.
-
-## AI-Powered Summaries
-
-### Activity Summaries
-For each activity within an assessment, the tool generates an AI-driven summary. These summaries highlight areas where the organisation has shown progress and suggest improvements needed to reach the next level of maturity. This feature helps users quickly understand their current standing without diving into the detailed responses.
-
-### Dimension Summaries
-The AI also provides summaries for each dimension within the assessment. These summaries aggregate the insights from individual activities, offering a broader perspective on how the organisation performs across a particular domain.
-
-### Executive Summary
-At the top level, the tool generates an executive summary. This overview distills the key findings from all dimensions into a cohesive narrative, offering high-level recommendations and insights for strategic decision-making.
-
-## Available Assessments
-
-### 1. Open Data Maturity Model
-This model assesses an organisation's maturity in publishing and using open data. It helps organisations understand where they are on their open data journey and what steps they need to take to progress.
-
-### 2. Data Ethics Maturity Model (Coming Soon)
-This model will help organisations assess their maturity in handling data ethically, ensuring that data practices are aligned with ethical standards.
-
-### 3. Data Practices Maturity Model
-This assessment will evaluate an organisation's data practices across key areas of data governance and management.
+Currently this server implementation does not provide the ability to create dashboards, queries or retrieve statements. It is just there to provide an endpoint for clients to talk to.
 
 ## Installation
 
-### Prerequisites
+1. **Clone the repository**:
+    ```bash
+    git clone https://github.com/yourusername/xAPI-Server-Essentials.git
+    cd xAPI-Server-Essentials
+    ```
 
-Before installing the ODI Maturity Assessment Tool, ensure you have the following installed on your system:
+2. **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
-- **Node.js** (v14.x or later)
-- **npm** (v6.x or later)
-- **MongoDB** (Ensure you have a running MongoDB instance)
+3. **Create a `.env` file**:
+    Add your MongoDB connection details, session secret, and other necessary environment variables in a `.env` file:
+    ```
+    MONGO_URI=mongodb://localhost:27017
+    MONGO_DB=xapi_server
+    SESSION_SECRET=your-secret-key
+    ```
 
-### Step-by-Step Installation
-
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/yourusername/maturity.theodi.org.git
-   cd omaturity.theodi.org
-   ```
-
-2. **Install Dependencies**
-   Install the necessary Node.js packages by running:
-   ```bash
-   npm install
-   ```
-
-3. **Configure the Environment Variables**
-   Create a `config.env` file in the root directory and add the following environment variables as well as login method:
-
-   ```
-   NODE_ENV=development
-   PORT=3000
-   MONGODB_URI=mongodb://localhost:27017/odi_maturity_tool
-   SESSION_SECRET=your-secret-key
-   OPENAI_API_KEY=your-openai-api-key
-   ```
-
-   Replace `your-secret-key` and `your-openai-api-key` with your own secure values.
-
-## Running the Application
-
-Once the installation is complete, you can start the application with:
-
-```bash
-npm start
-```
-
-The application will be accessible at `http://localhost:3000` by default.
+4. **Start the server**:
+    ```bash
+    npm start
+    ```
 
 ## Usage
 
-### Accessing Assessments
+### Endpoints
 
-- **Open Data Maturity Model**: Navigate to the assessment section and select the Open Data Maturity Model to start the evaluation.
-- **Upcoming Assessments**: Look out for updates that will introduce new assessments like the Data Ethics Maturity Model and Data Practices Maturity Assessment.
+- **/xAPI/statements** (POST)
+    - Accepts xAPI statements for submission but does **not** allow retrieval of statements.
+    - This ensures no personal data can be accessed via the API, providing additional security.
 
-### Generating AI-Powered Reports
+- **/xAPI/activities/state** (POST/PUT/GET)
+    - Manages xAPI state data for learning activities.
+    - Clients can store state data using `POST/PUT` and retrieve state data using `GET`.
 
-After completing an assessment, you can generate a detailed report with AI-powered summaries. These summaries are automatically generated for each activity, dimension, and an overall executive summary, providing actionable insights and recommendations.
+### Authentication
 
-Reports can be downloaded in various formats, such as JSON or DOCX, for further analysis.
+The server uses Basic Authentication with API keys to authenticate clients. Clients are required to provide the following information in the request headers:
+
+- `Authorization: Basic {base64(api_key:api_secret)}`
+- `Origin`: Must match the client's registered origin to pass the origin check.
+
+### Security
+
+xAPI-Server-Essentials enforces strict limitations on the operations a client can perform:
+- **Statements**: Clients can only submit xAPI statements but cannot retrieve them.
+- **State**: Clients can store and retrieve state data, ensuring proper functionality for tracking learner progress without exposing sensitive data.
+
+This design is intended to protect against attacks where an API key could be used to gather personal or private information.
+
+## Configuration
+
+You can configure the server via the `.env` file:
+- **MONGO_URI**: MongoDB connection URI.
+- **MONGO_DB**: MongoDB database name.
+- **SESSION_SECRET**: Secret key for sessions.
+
+## Security Considerations
+
+The server includes multiple layers of security to protect against unauthorized access:
+- **Client Restrictions**: Clients are strictly limited in the operations they can perform (no statement retrieval).
+- **Origin Checks**: Requests must originate from approved domains.
+- **Basic Auth**: Ensures that only authorized clients can submit or retrieve state data.
+
+## Roadmap
+
+- **Improved Logging**: Add detailed logs for tracking request/response flow.
+- **Admin Dashboard**: Add a UI for managing clients and viewing system health.
+- **Additional Security Features**: Implement rate-limiting and IP whitelisting.
 
 ## Contributing
 
-We welcome contributions from the community! If you'd like to contribute, please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/your-feature-name`).
-3. Make your changes.
-4. Commit your changes (`git commit -am 'Add new feature'`).
-5. Push to the branch (`git push origin feature/your-feature-name`).
-6. Create a new Pull Request.
+If you would like to contribute to this project, please submit a pull request or open an issue to discuss any features or improvements.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
