@@ -11,6 +11,7 @@ router.options('/statements', (req, res) => {
 
 // POST route for statements (protected by client authentication middleware)
 router.post('/statements', authClient, xAPIController.postStatement);
+router.put('/statements', authClient, xAPIController.postStatement);
 
 // POST/PUT routes to store state data (protected by client authentication middleware)
 router.post('/activities/state', authClient, xAPIController.storeState);

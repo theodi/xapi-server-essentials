@@ -16,13 +16,13 @@ exports.postStatement = async (req, res) => {
         clientAuthority.objectType = "Agent";
 
         // Validate the structure of the incoming statement
-        const { actor, verb, object, result, context } = req.body;
+        const { actor, verb, object, result, context, stored } = req.body;
         if (!actor || !verb || !object) {
             return res.status(400).json({ error: 'Invalid statement structure: actor, verb, and object are required' });
         }
 
-        // Prepare the data to be saved
-        const storedDate = new Date();
+        // Use the stored date from the request if it exists, otherwise generate a new one
+        const storedDate = stored ? new Date(stored) : new Date();
         const activities = [object.id];
         const agents = [`${actor.account.homePage}|${actor.account.name}`];
         const verbs = [verb.id];
@@ -54,16 +54,16 @@ exports.postStatement = async (req, res) => {
             activities,
             agents,
             statement: {
-                authority: clientAuthority,  // The modified authority
-                stored: storedDate,
                 actor: req.body.actor,
-                timestamp: storedDate,
-                version: "1.0.0",
-                id: req.body.id,
-                result: req.body.result || { completion: false },
                 verb: req.body.verb,
                 object: req.body.object,
-                context: req.body.context || {}  // Add context to the statement
+                result: req.body.result || { completion: false },
+                context: req.body.context || {},  // Add context to the statement
+                id: req.body.id,
+                stored: storedDate,
+                timestamp: storedDate,
+                authority: clientAuthority,  // The modified authority
+                version: "1.0.0"
             },
             verbs,
             person: {
@@ -73,7 +73,7 @@ exports.postStatement = async (req, res) => {
             timestamp: storedDate,
             relatedActivities,
             relatedAgents: agents.concat([clientAuthority.mbox]),
-            organisation: clientAuthority._id // Organisation ID from the client
+            organisation: clientAuthority._id // Organisation ID from the clien
         });
 
         // Save the statement to the database
