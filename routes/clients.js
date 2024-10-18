@@ -9,6 +9,22 @@ router.use(ensureAuthenticated);
 // GET the form for adding a new client (renders the add page)
 router.get('/new', clientController.renderAddClientForm);
 
+// Route to get the count of statements for a specific client
+router.get('/:id/statements/count', clientController.getClientStatementCount);
+
+// Add the new route for activity summary
+router.get('/:id/activity-summary', clientController.getActivitySummary);
+
+// Route to render the client dashboard (HTML)
+router.get('/:id/dashboard', (req, res) => {
+    const clientId = req.params.id;
+    const page = {
+        title: "Client Dashboard"
+    };
+    res.locals.page = page;
+    res.render('pages/clients/dashboard', { clientId }); // Pass only clientId to the EJS page
+});
+
 // GET all clients
 router.get('/', clientController.getAllClients);
 

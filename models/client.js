@@ -39,6 +39,17 @@ const clientKeySchema = new mongoose.Schema({
     isDisabled: {
         type: Boolean,
         default: false
+    },
+    // New field for dashboard activities
+    dashboardActivities: {
+        type: [String], // Array of strings (URLs)
+        validate: {
+            validator: function(v) {
+                return v.every(url => /^https?:\/\/.*/.test(url)); // Validate if all elements are valid URLs
+            },
+            message: props => `${props.value} is not a valid URL!`
+        },
+        default: []
     }
 }, {
     timestamps: true

@@ -33,6 +33,12 @@
         "isDisabled": {
           "type": "boolean",
           "title": "Disabled"
+        },
+        "dashboardActivities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -62,6 +68,9 @@
       },
       {
         "key": "isDisabled"
+      },
+      {
+        "key": "dashboardActivities"
       },
       {
         "type": "submit",

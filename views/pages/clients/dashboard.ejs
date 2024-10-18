@@ -1,0 +1,91 @@
+<%- include('../../partials/header') %>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<div class="content-block white">
+    <h1>Client Dashboard</h1>
+
+    <div id="dashboardContent">
+        <!-- Content will be dynamically populated here -->
+    </div>
+
+    <p id="noActivitiesMessage" style="display:none;">No activities available for this client.</p>
+</div>
+
+<script>
+$(document).ready(function () {
+    const clientId = '<%= clientId %>'; // Only pass the clientId via EJS
+
+    // Fetch client data including dashboardActivities
+    $.ajax({
+        url: `/clients/${clientId}`,
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json' // Ensure the request asks for JSON
+        },
+        success: function(clientData) {
+            if (clientData.dashboardActivities && clientData.dashboardActivities.length > 0) {
+                $('#noActivitiesMessage').hide();
+
+                // Iterate over dashboard activities and fetch summary data for each
+                clientData.dashboardActivities.forEach(function(activity) {
+                    const activityId = activity;
+                    const chartId = 'chart-' + activity.replace(/[^a-zA-Z0-9]/g, '_');
+
+                    // Append HTML for the canvas and activity title
+                    $('#dashboardContent').append(`
+                        <div class="activity-summary">
+                            <h2>${activity}</h2>
+                            <canvas id="${chartId}" width="400" height="200"></canvas>
+                        </div>
+                    `);
+
+                    // Fetch the activity summary for this activity
+                    $.ajax({
+                        url: `/clients/${clientId}/activity-summary`,
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+                        data: { activity: encodeURIComponent(activityId) },
+                        success: function(summaryData) {
+                            // Process the summary data to extract labels (verbs) and data (counts)
+                            const labels = summaryData.map(item => item.verb);
+                            const data = summaryData.map(item => item.count);
+
+                            // Create the chart
+                            const ctx = document.getElementById(chartId).getContext('2d');
+                            const myChart = new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        label: 'Count',
+                                        data: data,
+                                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                        borderColor: 'rgba(75, 192, 192, 1)',
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    indexAxis: 'y',  // This makes the chart horizontal
+                                    scales: {
+                                        x: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            } else {
+                $('#noActivitiesMessage').show();
+            }
+        }
+    });
+});
+</script>
+
+<%- include('../../partials/footer') %>

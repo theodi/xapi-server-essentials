@@ -1,4 +1,4 @@
-<!-- views/sources.ejs -->
+<!-- views/clients.ejs -->
 <%- include('../../partials/header') %>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
@@ -53,13 +53,13 @@ function renderclients() {
         {
                 data: 'title',
                 title: 'Title',
-                width: '20%',
+                width: '10%',
                 defaultContent: ''
             },
             {
                 data: 'authority.name',
                 title: 'Authority',
-                width: '20%',
+                width: '15%',
                 defaultContent: ''
             },
             {
@@ -69,16 +69,25 @@ function renderclients() {
                 defaultContent: ''
             },
             {
+                title: 'Statement Count',
+                width: '15%',
+                render: function (data, type, row) {
+                    // Render a placeholder and use AJAX to fetch the count
+                    return '<span class="statement-count" data-client-id="' + row._id + '">Loading...</span>';
+                }
+            },
+            {
                 data: 'isDisabled',
                 title: 'Disabled',
-                width: '20%',
+                width: '10%',
                 defaultContent: 'false'
             },
             {
                 title: 'Actions',
-                width: '20%',
+                width: '30%',
                 render: function (data, type, row) {
-                    return '<button class="editBtn" data-id="' + row._id + '">Edit</button>' +
+                    return '<button class="viewDashboard" data-id="' + row._id + '">Dashboard</button>' +
+                           '<button class="editBtn" data-id="' + row._id + '">Edit</button>' +
                            '<button class="deleteBtn" data-id="' + row._id + '">Delete</button>'
                 }
             }
@@ -87,7 +96,31 @@ function renderclients() {
         dom: 'Bfrtip', // Show buttons for export
         buttons: [
             //'copy', 'csv', 'excel', 'pdf', 'print'
-        ]
+        ],
+        initComplete: function () {
+            // Fetch and populate the statement counts once the table is fully initialized
+            $('#clientsTable').find('.statement-count').each(function () {
+                const clientId = $(this).data('client-id');
+                const countElement = $(this);
+
+                // Fetch the statement count for this client
+                $.ajax({
+                    url: '/clients/' + clientId + '/statements/count',
+                    type: 'GET',
+                    success: function (data) {
+                        countElement.text(data.statementCount);
+                    },
+                    error: function () {
+                        countElement.text('Error');
+                    }
+                });
+            });
+        }
+    });
+
+    $('#clientsTable').on('click', '.viewDashboard', function () {
+        var id = $(this).data('id');
+        window.location.href = '/clients/' + id + "/dashboard";
     });
 
     $('#clientsTable').on('click', '.editBtn', function () {
