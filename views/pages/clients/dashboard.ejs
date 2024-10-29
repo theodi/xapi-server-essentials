@@ -6,6 +6,17 @@
 <div class="content-block white">
     <h1>Client Dashboard</h1>
 
+    <h2>Overall Summary</h2>
+    <div id="overallSummaryContent" class="summary-content"></div>
+    <canvas id="OverallLine" width="400" height="200"></canvas>
+    <h3>Progression through learning</h3>
+    <p>This section shows a count of actors who have interacted with <i>n</i> activities. The more actors have interacted with, the better.</p>
+    <div id="progressionSummary">
+        <!-- Progression data will be populated here -->
+    </div>
+
+
+    <h2>Activity Summaries</h2>
     <div id="dashboardContent">
         <!-- Content will be dynamically populated here -->
     </div>
@@ -13,35 +24,147 @@
     <p id="noActivitiesMessage" style="display:none;">No activities available for this client.</p>
 </div>
 
+<template id="numberTemplate">
+    <div class="numberBox">
+        <div class="title" id="templateTitle"></div>
+        <div class="number" id="templateNumber"></div>
+    </div>
+</template>
+
+<style>
+    .numberBox {
+        display: inline-block;
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin: 10px;
+        text-align: center;
+        border-radius: 8px;
+        background-color: #f4f4f4;
+    }
+    .title {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .number {
+        font-size: 1.5em;
+        color: #333;
+    }
+    .verb-progression {
+        margin: 20px 0;
+    }
+    .verb-progression h3 {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+</style>
+
 <script>
 $(document).ready(function () {
     const clientId = '<%= clientId %>'; // Only pass the clientId via EJS
 
-    // Fetch client data including dashboardActivities
+    // Fetch overall summary without filtering by activityId
+    $.ajax({
+        url: `/clients/${clientId}/overall-summary`,
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        },
+        success: function(summaryData) {
+            const container = $('#overallSummaryContent');
+            summaryData.forEach(item => {
+                const verb = getVerbFromUrl(item.verb);
+                const count = item.count;
+
+                const template = document.getElementById('numberTemplate').content.cloneNode(true);
+                $(template).find('#templateTitle').text(verb);
+                $(template).find('#templateNumber').text(count);
+
+                container.append(template);
+            });
+        }
+    });
+
+    // Fetch cumulative monthly data for each activity
+    $.ajax({
+        url: `/clients/${clientId}/monthly-verb-summary-all`,
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        },
+        success: function(data) {
+            renderCumulativeLineChart(data, "OverallLine");
+        }
+    });
+
+    $.ajax({
+        url: `/clients/${clientId}/actor-progression-summary`,
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json' // Ensure the request asks for JSON
+        },
+        success: function(progressionData) {
+            // Create a set of unique activity counts to use as column headers
+            const activityLevels = new Set();
+            progressionData.forEach(verbData => {
+                verbData.progression.forEach(level => {
+                    activityLevels.add(level.activities);
+                });
+            });
+
+            // Sort the activity levels and convert to an array
+            const sortedActivityLevels = Array.from(activityLevels).sort((a, b) => a - b);
+
+            // Build the table
+            const table = $('<table class="progressionTable"><thead><tr><th>Verb</th></tr></thead><tbody></tbody></table>');
+
+            // Append activity levels as table headers
+            sortedActivityLevels.forEach(level => {
+                table.find('thead tr').append(`<th>${level} Activities</th>`);
+            });
+
+            // Populate each row with verb and actor counts for each activity level
+            progressionData.forEach(verbData => {
+                const row = $(`<tr><td>${getVerbFromUrl(verbData.verb)}</td></tr>`);
+                sortedActivityLevels.forEach(level => {
+                    const count = verbData.progression.find(item => item.activities === level);
+                    row.append(`<td>${count ? count.actors : 0}</td>`);
+                });
+                table.find('tbody').append(row);
+            });
+
+            // Append the table to the progressionSummary container
+            $('#progressionSummary').empty().append(table);
+        },
+        error: function() {
+            $('#progressionSummary').text("Unable to load progression data.");
+        }
+    });
+
+    // Fetch client data including dashboardActivities for individual activity summaries
     $.ajax({
         url: `/clients/${clientId}`,
         method: 'GET',
         headers: {
-            'Accept': 'application/json' // Ensure the request asks for JSON
+            'Accept': 'application/json'
         },
         success: function(clientData) {
             if (clientData.dashboardActivities && clientData.dashboardActivities.length > 0) {
                 $('#noActivitiesMessage').hide();
 
-                // Iterate over dashboard activities and fetch summary data for each
+                // Process each dashboard activity
                 clientData.dashboardActivities.forEach(function(activity) {
                     const activityId = activity;
                     const chartId = 'chart-' + activity.replace(/[^a-zA-Z0-9]/g, '_');
 
-                    // Append HTML for the canvas and activity title
                     $('#dashboardContent').append(`
                         <div class="activity-summary">
-                            <h2>${activity}</h2>
-                            <canvas id="${chartId}" width="400" height="200"></canvas>
+                            <h3>${activity}</h3>
+                            <div id="activity-${activity.replace(/[^a-zA-Z0-9]/g, '_')}-summary"></div>
+                            <canvas id="${chartId}Line" width="400" height="200"></canvas>
                         </div>
                     `);
 
-                    // Fetch the activity summary for this activity
+                    // Fetch activity-specific summary
                     $.ajax({
                         url: `/clients/${clientId}/activity-summary`,
                         method: 'GET',
@@ -50,33 +173,31 @@ $(document).ready(function () {
                         },
                         data: { activity: encodeURIComponent(activityId) },
                         success: function(summaryData) {
-                            // Process the summary data to extract labels (verbs) and data (counts)
-                            const labels = summaryData.map(item => item.verb);
-                            const data = summaryData.map(item => item.count);
+                            const container = $(`#activity-${activity.replace(/[^a-zA-Z0-9]/g, '_')}-summary`);
 
-                            // Create the chart
-                            const ctx = document.getElementById(chartId).getContext('2d');
-                            const myChart = new Chart(ctx, {
-                                type: 'bar',
-                                data: {
-                                    labels: labels,
-                                    datasets: [{
-                                        label: 'Count',
-                                        data: data,
-                                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                        borderColor: 'rgba(75, 192, 192, 1)',
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    indexAxis: 'y',  // This makes the chart horizontal
-                                    scales: {
-                                        x: {
-                                            beginAtZero: true
-                                        }
-                                    }
-                                }
+                            summaryData.forEach(item => {
+                                const verb = getVerbFromUrl(item.verb);
+                                const count = item.count;
+
+                                const template = document.getElementById('numberTemplate').content.cloneNode(true);
+                                $(template).find('#templateTitle').text(verb);
+                                $(template).find('#templateNumber').text(count);
+
+                                container.append(template);
                             });
+                        }
+                    });
+
+                    // Fetch cumulative monthly data for each activity
+                    $.ajax({
+                        url: `/clients/${clientId}/monthly-verb-summary`,
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+                        data: { activity: encodeURIComponent(activityId) },
+                        success: function(data) {
+                            renderCumulativeLineChart(data, chartId + "Line");
                         }
                     });
                 });
@@ -85,6 +206,80 @@ $(document).ready(function () {
             }
         }
     });
+
+    function renderCumulativeLineChart(data, chartId) {
+        const cumulativeData = {};
+        const allMonths = new Set();
+
+        data.forEach(entry => {
+            const { yearMonth, verb, uniqueInteractions } = entry;
+            allMonths.add(yearMonth);
+
+            if (!cumulativeData[verb]) {
+                cumulativeData[verb] = { cumulativeCount: 0 };
+            }
+
+            cumulativeData[verb][yearMonth] = cumulativeData[verb].cumulativeCount + uniqueInteractions;
+            cumulativeData[verb].cumulativeCount = cumulativeData[verb][yearMonth];
+        });
+
+        const sortedMonths = Array.from(allMonths).sort();
+
+        const datasets = Object.keys(cumulativeData).map(verb => {
+            let lastCount = 0;
+            const dataPoints = sortedMonths.map(month => {
+                if (cumulativeData[verb][month] != null) {
+                    lastCount = cumulativeData[verb][month];
+                }
+                return lastCount;
+            });
+
+            return {
+                label: getVerbFromUrl(verb),
+                data: dataPoints,
+                fill: false,
+                borderColor: getRandomColor(),
+                tension: 0.1
+            };
+        });
+
+        const ctx = document.getElementById(chartId).getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: sortedMonths,
+                datasets: datasets
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Cumulative Interactions' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Year-Month' }
+                    }
+                },
+                plugins: {
+                    legend: { display: true, position: 'bottom' }
+                }
+            }
+        });
+    }
+
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function getVerbFromUrl(url) {
+        const verbName = url.substring(url.lastIndexOf('/') + 1);
+        return verbName.charAt(0).toUpperCase() + verbName.slice(1);
+    }
 });
 </script>
 

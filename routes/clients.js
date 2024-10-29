@@ -12,8 +12,18 @@ router.get('/new', clientController.renderAddClientForm);
 // Route to get the count of statements for a specific client
 router.get('/:id/statements/count', clientController.getClientStatementCount);
 
-// Add the new route for activity summary
+// Route for client summary
+router.get('/:id/overall-summary', clientController.getOverallSummary);
+
+// Route for activity summary
 router.get('/:id/activity-summary', clientController.getActivitySummary);
+
+router.get('/:id/monthly-verb-summary-all', clientController.getMonthlyVerbSummaryAllActivities);
+
+// Route for monthly verb summary
+router.get('/:id/monthly-verb-summary', clientController.getMonthlyVerbSummary);
+
+router.get('/:id/actor-progression-summary', clientController.getActorProgressionSummary);
 
 // Route to render the client dashboard (HTML)
 router.get('/:id/dashboard', (req, res) => {

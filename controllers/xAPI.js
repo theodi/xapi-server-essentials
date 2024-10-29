@@ -93,7 +93,7 @@ function getLockKey(activityId, agent, stateId) {
 
 // POST/PUT a new or updated state
 exports.storeState = async (req, res) => {
-    const { activityId, agent, stateId } = req.query;
+    const { activityId, agent, stateId, lastModified } = req.query;
 
     // Validate the query parameters
     if (!activityId || !agent || !stateId || !req.body) {
@@ -111,13 +111,16 @@ exports.storeState = async (req, res) => {
         // Get the state data (can be any type)
         const state = req.body;
 
+        // Determine the date to use for createdDate and lastUpdated
+        const timestamp = lastModified ? new Date(lastModified) : Date.now();
+
         // Find existing state by activityId, agent, and stateId
         let stateRecord = await State.findOne({ activityId, agent: parsedAgent, stateId });
 
         if (stateRecord) {
             // Overwrite the state and update the metadata
             stateRecord.state = state;
-            stateRecord.lastUpdated = Date.now();
+            stateRecord.lastUpdated = timestamp;
         } else {
             // Create a new state record
             stateRecord = new State({
@@ -127,8 +130,8 @@ exports.storeState = async (req, res) => {
                 state,  // Store the state directly
                 clientId: req.client._id,
                 organisationId: req.client.authority._id,
-                createdDate: Date.now(),
-                lastUpdated: Date.now()
+                createdDate: timestamp,
+                lastUpdated: timestamp
             });
         }
 
