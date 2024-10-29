@@ -67,10 +67,13 @@
         "htmlClass": "textArea"
       },
       {
-        "key": "isDisabled"
+        "key": "isDisabled",
+        "htmlClass": "isDisabled"
       },
       {
-        "key": "dashboardActivities"
+        "key": "dashboardActivities",
+        "title": "Activities to track on dashboard",
+        "htmlClass": "dashboardActivities"
       },
       {
         "type": "submit",
