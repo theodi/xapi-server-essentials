@@ -4,24 +4,26 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
 <div class="content-block white">
-    <h1>Client Dashboard</h1>
+    <div style="max-width: 1200px; margin-left: auto; margin-right: auto">
+        <h1>Client Dashboard</h1>
 
-    <h2>Overall Summary</h2>
-    <div id="overallSummaryContent" class="summary-content"></div>
-    <canvas id="OverallLine" width="400" height="200"></canvas>
-    <h3>Progression through learning</h3>
-    <p>This section shows a count of actors who have interacted with <i>n</i> activities. The more actors have interacted with, the better.</p>
-    <div id="progressionSummary">
-        <!-- Progression data will be populated here -->
+        <h2>Overall Summary</h2>
+        <div id="overallSummaryContent" class="summary-content"></div>
+        <canvas id="OverallLine" width="400" height="200"></canvas>
+        <h3>Progression through learning</h3>
+        <p>This section shows a count of actors who have interacted with <i>n</i> activities. The more actors have interacted with, the better.</p>
+        <div id="progressionSummary">
+            <!-- Progression data will be populated here -->
+        </div>
+
+
+        <h2>Activity Summaries</h2>
+        <div id="dashboardContent">
+            <!-- Content will be dynamically populated here -->
+        </div>
+
+        <p id="noActivitiesMessage" style="display:none;">No activities available for this client.</p>
     </div>
-
-
-    <h2>Activity Summaries</h2>
-    <div id="dashboardContent">
-        <!-- Content will be dynamically populated here -->
-    </div>
-
-    <p id="noActivitiesMessage" style="display:none;">No activities available for this client.</p>
 </div>
 
 <template id="numberTemplate">
