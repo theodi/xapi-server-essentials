@@ -24,18 +24,22 @@ exports.getOverallSummary = async (req, res) => {
             return res.status(404).json({ error: 'Client not found' });
         }
 
-        // Get dashboardActivities from the client object
-        const { dashboardActivities } = client;
-        if (!dashboardActivities || dashboardActivities.length === 0) {
-            return res.status(400).json({ error: 'No dashboard activities configured for this client' });
+        // Extract URIs from dashboardActivities
+        const activityURIs = client.dashboardActivities
+            .map(activity => activity.uri)
+            .filter(uri => typeof uri === 'string'); // Ensure only valid URIs are included
+
+        if (activityURIs.length === 0) {
+            return res.status(400).json({ error: 'No valid dashboard activities configured for this client' });
         }
+
 
         // Aggregate statements matching any of the dashboardActivities
         const overallSummary = await Statement.aggregate([
             {
                 $match: {
                     client: clientObjectId,
-                    activities: { $in: dashboardActivities }
+                    activities: { $in: activityURIs }
                 }
             },
             // Unwind verbs to handle cases with multiple verbs per statement
@@ -163,18 +167,21 @@ exports.getMonthlyVerbSummaryAllActivities = async (req, res) => {
             return res.status(404).json({ error: 'Client not found' });
         }
 
-        const { dashboardActivities } = client;
-        if (!dashboardActivities || dashboardActivities.length === 0) {
-            return res.status(400).json({ error: 'No dashboard activities configured for this client' });
-        }
+        // Extract URIs from dashboardActivities
+        const activityURIs = client.dashboardActivities
+            .map(activity => activity.uri)
+            .filter(uri => typeof uri === 'string'); // Ensure only valid URIs are included
 
+        if (activityURIs.length === 0) {
+            return res.status(400).json({ error: 'No valid dashboard activities configured for this client' });
+        }
         // Aggregate statements by YYYY-MM format for the stored date and group by verbs
         const monthlyVerbSummary = await Statement.aggregate([
             // Match statements for the specific client and dashboard activities
             {
                 $match: {
                     client: clientObjectId,
-                    activities: { $in: dashboardActivities }
+                    activities: { $in: activityURIs }
                 }
             },
             // Project necessary fields and format the date as YYYY-MM
@@ -358,9 +365,13 @@ exports.getActorProgressionSummary = async (req, res) => {
             return res.status(404).json({ error: 'Client not found' });
         }
 
-        const { dashboardActivities } = client;
-        if (!dashboardActivities || dashboardActivities.length === 0) {
-            return res.status(400).json({ error: 'No dashboard activities configured for this client' });
+        // Extract URIs from dashboardActivities
+        const activityURIs = client.dashboardActivities
+            .map(activity => activity.uri)
+            .filter(uri => typeof uri === 'string'); // Ensure only valid URIs are included
+
+        if (activityURIs.length === 0) {
+            return res.status(400).json({ error: 'No valid dashboard activities configured for this client' });
         }
 
         // Verbs to analyze
@@ -378,7 +389,7 @@ exports.getActorProgressionSummary = async (req, res) => {
                 {
                     $match: {
                         client: clientObjectId,
-                        activities: { $in: dashboardActivities },
+                        activities: { $in: activityURIs },
                         verbs: verb
                     }
                 },

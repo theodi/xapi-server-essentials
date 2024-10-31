@@ -2,6 +2,17 @@ const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 
+// Schema for dashboard activities
+const activitySchema = new mongoose.Schema({
+    uri: {
+        type: String,
+        required: true
+    },
+    name: {
+        type: String
+    }
+});
+
 // Schema for client keys
 const clientKeySchema = new mongoose.Schema({
     title: {
@@ -40,15 +51,9 @@ const clientKeySchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    // New field for dashboard activities
+    // Updated field for dashboard activities
     dashboardActivities: {
-        type: [String], // Array of strings (URLs)
-        validate: {
-            validator: function(v) {
-                return v.every(url => /^https?:\/\/.*/.test(url)); // Validate if all elements are valid URLs
-            },
-            message: props => `${props.value} is not a valid URL!`
-        },
+        type: [activitySchema], // Array of objects with URI id and name
         default: []
     }
 }, {

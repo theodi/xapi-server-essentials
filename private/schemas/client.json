@@ -37,7 +37,17 @@
         "dashboardActivities": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "object",
+            "properties": {
+              "uri": {
+                "type": "string",
+                "title": "URI"
+              },
+              "name": {
+                  "type": "string",
+                  "title": "Title"
+              }
+            }
           }
         }
       }
@@ -72,8 +82,28 @@
       },
       {
         "key": "dashboardActivities",
+        "type": "array",
         "title": "Activities to track on dashboard",
-        "htmlClass": "dashboardActivities"
+        "htmlClass": "dashboardActivities",
+        "items": [
+          {
+            "type": "fieldset",
+            "items": [
+              {
+                "key": "dashboardActivities[].uri",
+                "htmlClass": "dashboardActivitiesURI",
+                "prepend": "<b>URI</b>",
+                "notitle": true
+              },
+              {
+                "key": "dashboardActivities[].name",
+                "htmlClass": "dashboardActivitiesName",
+                "prepend": "<b>Name</b>",
+                "notitle": true
+              }
+            ]
+          }
+        ]
       },
       {
         "type": "submit",

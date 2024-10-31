@@ -155,13 +155,13 @@ $(document).ready(function () {
 
                 // Process each dashboard activity
                 clientData.dashboardActivities.forEach(function(activity) {
-                    const activityId = activity;
-                    const chartId = 'chart-' + activity.replace(/[^a-zA-Z0-9]/g, '_');
+                    const activityId = activity.uri;
+                    const chartId = 'chart-' + activityId.replace(/[^a-zA-Z0-9]/g, '_');
 
                     $('#dashboardContent').append(`
                         <div class="activity-summary">
-                            <h3>${activity}</h3>
-                            <div id="activity-${activity.replace(/[^a-zA-Z0-9]/g, '_')}-summary"></div>
+                            <h3>${activity.name || activity.uri}</h3>
+                            <div id="activity-${activityId.replace(/[^a-zA-Z0-9]/g, '_')}-summary"></div>
                             <canvas id="${chartId}Line" width="400" height="200"></canvas>
                         </div>
                     `);
@@ -175,7 +175,7 @@ $(document).ready(function () {
                         },
                         data: { activity: encodeURIComponent(activityId) },
                         success: function(summaryData) {
-                            const container = $(`#activity-${activity.replace(/[^a-zA-Z0-9]/g, '_')}-summary`);
+                            const container = $(`#activity-${activityId.replace(/[^a-zA-Z0-9]/g, '_')}-summary`);
 
                             summaryData.forEach(item => {
                                 const verb = getVerbFromUrl(item.verb);

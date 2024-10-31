@@ -78,6 +78,17 @@
         }
 
         function renderForm(schema, formData) {
+            if (Array.isArray(formData.dashboardActivities)) {
+                const isArrayOfURIs = formData.dashboardActivities.every(activity => typeof activity === 'string');
+
+                if (isArrayOfURIs) {
+                    formData.dashboardActivities = formData.dashboardActivities.map(uri => ({
+                        uri: uri,
+                        name: "" // Default name; modify as needed
+                    }));
+                }
+            }
+            console.log(formData);
             // Render the form with the provided schema and data
             $('#dataForm').jsonForm({
                 schema: schema.schema,
