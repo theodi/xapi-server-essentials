@@ -19,6 +19,7 @@
         // Grab client ID from the server-rendered template variable, if available
         const clientId = "<%= typeof clientId !== 'undefined' ? clientId : '' %>";
         let data = {}; // Initialize as empty
+        let authoritiesData = {};
 
         $('#dataForm').html("");
         $('#res').html("");
@@ -34,7 +35,8 @@
             .then(response => response.json())
             .then(authorities => {
                 // Format authorities for enum (name concatenated with id)
-                const authorityEnum = authorities.map(auth => `${auth.name} (${auth._id})`);
+                const authorityEnum = authorities.map(auth => `${auth._id}`);
+                authoritiesData = authorities;
 
                 // Fetch the client data if editing (i.e., if clientId exists)
                 if (clientId) {
@@ -82,14 +84,20 @@
                 form: schema.form,
                 value: formData,  // Use the fetched data to populate the form
                 onSubmit: function (errors, values) {
-                    if (values.authority) {
-                        // Extract authority ID from the concatenated string (e.g., "auth 1 (id)")
-                        const authorityId = values.authority.match(/\(([^)]+)\)$/)[1];
-                        values.authority = authorityId;  // Replace with just the ID
-                    }
                     submitClientForm(errors, values);
                 }
             });
+            setTimeout(() => {
+                const authoritySelect = document.querySelector('[name="authority"]');
+                if (authoritySelect) {
+                    authoritySelect.querySelectorAll('option').forEach(option => {
+                        const authority = authoritiesData.find(auth => auth._id === option.value);
+                        if (authority) {
+                            option.textContent = authority.name; // Update the text displayed for the option
+                        }
+                    });
+                }
+            }, 200);
         }
 
         function submitClientForm(errors, values) {

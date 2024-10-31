@@ -11,12 +11,13 @@ The server is written in Node.js with Express, MongoDB for persistence, and Mong
 - **Client-Level Permissions**: Hardcoded limitations on what operations a client can perform. Clients can store and retrieve state data but are restricted from accessing xAPI statements.
 - **Secure Client Authentication**: Uses Basic Auth and API keys for client authentication, with an additional layer of security that checks for matching origins.
 - **Protection Against Data Harvesting**: The inability to retrieve statements protects against attacks where client keys could be misused to access sensitive information.
+- **Useful dashboards**: Each client has a dashboard that shows key information about engagement with activities, including number of initialisations, attempts, passes and completions (4 main verbs, all the rest are ignored)
 
 ## Comparison to Learning Locker
 
-While xAPI-Server-Essentials provides much of the same functionality as Learning Locker for state and statement handling, the key distinction is in its security model. Learning Locker provides more flexibility in data retrieval, but xAPI-Server-Essentials takes a more restrictive approach to protect user data, making it ideal for use cases where security and privacy are top priorities.
+While xAPI-Server-Essentials provides much of the same functionality as Learning Locker for state and statement handling, the key distinction is in its security model. Learning Locker provides more flexibility in data retrieval, but xAPI-Server-Essentials takes a more restrictive approach to protect user data.
 
-Currently this server implementation does not provide the ability to create dashboards, queries or retrieve statements. It is just there to provide an endpoint for clients to talk to.
+Learning locker doesn't provide useful dashboards. It provides a way to write queries that are also not that useful as the query language does not allow for powerful sorting, aggregation, grouping that modern scalable database systems (such as Mongo) provide built it.
 
 ## Installation
 
@@ -45,6 +46,19 @@ Currently this server implementation does not provide the ability to create dash
     ```
 
 ## Usage
+
+### Connecting your XAPI learning objects
+Before you can do this you need to create a new client key which consists of two stages:
+    1. Create an authority
+    2. Create a client key for that authority
+
+#### Creating authorities
+Authorities are organisations, the owners of the learning activities. Click Manage clients -> Manage authorities to create one
+
+#### Creating clients
+You can now create a set of client credentials for your XAPI learning objects to use under Manage clients. You should create a new client for every new learning experience, which may consist of one or more activities you want to track as part of one experience. In order for the dashbaord to work you will need to specify the activity IDs you want to track. These are the URIs for each actiity in your XAPI objects and correspond to a top level learnin gobject like an Adapt eLearning course.
+
+### Dashboards
 
 ### Endpoints
 
