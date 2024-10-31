@@ -54,6 +54,7 @@ exports.getOverallSummary = async (req, res) => {
                             "http://adlnet.gov/expapi/verbs/launched",
                             "http://adlnet.gov/expapi/verbs/attempted",
                             "http://adlnet.gov/expapi/verbs/passed",
+                            "http://adlnet.gov/expapi/verbs/failed",
                             "http://adlnet.gov/expapi/verbs/completed"
                         ]
                     }
@@ -121,6 +122,7 @@ exports.getActivitySummary = async (req, res) => {
                             "http://adlnet.gov/expapi/verbs/launched",
                             "http://adlnet.gov/expapi/verbs/attempted",
                             "http://adlnet.gov/expapi/verbs/passed",
+                            "http://adlnet.gov/expapi/verbs/failed",
                             "http://adlnet.gov/expapi/verbs/completed"
                         ]
                     }
@@ -206,6 +208,7 @@ exports.getMonthlyVerbSummaryAllActivities = async (req, res) => {
                             "http://adlnet.gov/expapi/verbs/launched",
                             "http://adlnet.gov/expapi/verbs/attempted",
                             "http://adlnet.gov/expapi/verbs/passed",
+                            "http://adlnet.gov/expapi/verbs/failed",
                             "http://adlnet.gov/expapi/verbs/completed"
                         ]
                     }
@@ -306,6 +309,7 @@ exports.getMonthlyVerbSummary = async (req, res) => {
                             "http://adlnet.gov/expapi/verbs/launched",
                             "http://adlnet.gov/expapi/verbs/attempted",
                             "http://adlnet.gov/expapi/verbs/passed",
+                            "http://adlnet.gov/expapi/verbs/failed",
                             "http://adlnet.gov/expapi/verbs/completed"
                         ]
                     }
@@ -379,6 +383,7 @@ exports.getActorProgressionSummary = async (req, res) => {
             "http://adlnet.gov/expapi/verbs/launched",
             "http://adlnet.gov/expapi/verbs/attempted",
             "http://adlnet.gov/expapi/verbs/passed",
+            "http://adlnet.gov/expapi/verbs/failed",
             "http://adlnet.gov/expapi/verbs/completed"
         ];
 
