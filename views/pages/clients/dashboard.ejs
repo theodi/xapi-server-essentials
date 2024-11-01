@@ -137,7 +137,7 @@ $(document).ready(function () {
             const sortedActivityLevels = Array.from(activityLevels).sort((a, b) => a - b);
 
             // Build the table
-            const table = $('<table class="progressionTable"><thead><tr><th>Verb</th></tr></thead><tbody></tbody></table>');
+            const table = $('<table class="progressionTable" id="progressionTable"><thead><tr><th>Verb</th></tr></thead><tbody></tbody></table>');
 
             // Append activity levels as table headers
             sortedActivityLevels.forEach(level => {
@@ -156,6 +156,29 @@ $(document).ready(function () {
 
             // Append the table to the progressionSummary container
             $('#progressionSummary').empty().append(table);
+
+            // Initialize DataTables with horizontal scrolling and paging for 12 columns
+            $('#progressionTable').DataTable({
+                fixedColumns: true,
+                scrollX: true,
+                paging: false,
+                scrollCollapse: true,
+                scrollX: true,
+                searching: false,
+                info: false,
+                layout: {
+                    bottomEnd: {
+                        buttons: ['copy', 'csv']
+                    }
+                },
+                drawCallback: function () {
+                    setTimeout(function() {
+                        // Scroll to the right by default
+                        const tableContainer = $('#'+tableId).parent();
+                        tableContainer.scrollLeft(tableContainer.get(0).scrollWidth);
+                    },1000);
+                }
+            });
         },
         error: function() {
             $('#progressionSummary').text("Unable to load progression data.");
@@ -288,7 +311,6 @@ $(document).ready(function () {
             },
             drawCallback: function () {
                 setTimeout(function() {
-                    console.log('in here');
                     // Scroll to the right by default
                     const tableContainer = $('#'+tableId).parent();
                     tableContainer.scrollLeft(tableContainer.get(0).scrollWidth);
