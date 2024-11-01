@@ -2,6 +2,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<link rel="stylesheet" href="//cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
+<link rel="stylesheet" href="//cdn.datatables.net/fixedcolumns/5.0.3/css/fixedColumns.dataTables.css">
+<script src="//cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+<script src="//cdn.datatables.net/fixedcolumns/5.0.3/js/dataTables.fixedColumns.js"></script>
+<script src="//cdn.datatables.net/fixedcolumns/5.0.3/js/fixedColumns.dataTables.js"></script>
+<style>
+    th, td { white-space: nowrap; }
+</style>
+
 
 <div class="content-block white">
     <div style="max-width: 1200px; margin-left: auto; margin-right: auto">
@@ -9,7 +18,13 @@
 
         <h2>Overall Summary</h2>
         <div id="overallSummaryContent" class="summary-content"></div>
+
         <canvas id="OverallLine" width="400" height="200"></canvas>
+        <h3>Monthly new engagements</h3>
+        <p>These figures show the breakdown of the above chart as monthly figures (non-cumulative)</p>
+        <div id="overallMonthlyFiguresTable">
+            <!-- Monthly figures table will be populated here -->
+        </div>
         <h3>Progression through learning</h3>
         <p>This section shows a count of actors who have interacted with <i>n</i> activities. The more actors have interacted with, the better.</p>
         <div id="progressionSummary">
@@ -95,6 +110,7 @@ $(document).ready(function () {
         },
         success: function(data) {
             renderCumulativeLineChart(data, "OverallLine");
+            renderMonthlyFiguresTable(data, "overallMonthlyFiguresTable");
         }
     });
 
@@ -157,12 +173,14 @@ $(document).ready(function () {
                 clientData.dashboardActivities.forEach(function(activity) {
                     const activityId = activity.uri;
                     const chartId = 'chart-' + activityId.replace(/[^a-zA-Z0-9]/g, '_');
+                    const tableId = 'table-' + activityId.replace(/[^a-zA-Z0-9]/g, '_');
 
                     $('#dashboardContent').append(`
                         <div class="activity-summary">
                             <h3>${activity.name || activity.uri}</h3>
                             <div id="activity-${activityId.replace(/[^a-zA-Z0-9]/g, '_')}-summary"></div>
                             <canvas id="${chartId}Line" width="400" height="200"></canvas>
+                            <div id="${tableId}"></div>
                         </div>
                     `);
 
@@ -200,6 +218,7 @@ $(document).ready(function () {
                         data: { activity: encodeURIComponent(activityId) },
                         success: function(data) {
                             renderCumulativeLineChart(data, chartId + "Line");
+                            renderMonthlyFiguresTable(data, tableId);
                         }
                     });
                 });
@@ -208,6 +227,66 @@ $(document).ready(function () {
             }
         }
     });
+
+    function renderMonthlyFiguresTable(data, elementName) {
+        const allMonths = new Set();
+        const verbDataMap = {};
+
+        // Organize data by verb and capture all unique months
+        data.forEach(entry => {
+            const { yearMonth, verb, uniqueInteractions } = entry;
+            allMonths.add(yearMonth);
+
+            if (!verbDataMap[verb]) {
+                verbDataMap[verb] = {};
+            }
+            verbDataMap[verb][yearMonth] = uniqueInteractions;
+        });
+
+        // Sort months and limit display to the last 12
+        const sortedMonths = Array.from(allMonths).sort();
+        const displayMonths = sortedMonths.slice(-12);
+        const tableId = elementName + "DataTable";
+        // Create table structure
+        const table = $('<table class="monthlyFiguresTable" id="'+tableId+'"><thead><tr><th>Verb</th></tr></thead><tbody></tbody></table>');
+
+        // Append the last 12 months as headers
+        displayMonths.forEach(month => {
+            table.find('thead tr').append(`<th>${month}</th>`);
+        });
+
+        // Populate table rows with data for each verb
+        Object.keys(verbDataMap).forEach(verb => {
+            const row = $(`<tr><td>${getVerbFromUrl(verb)}</td></tr>`);
+            displayMonths.forEach(month => {
+                const count = verbDataMap[verb][month] || 0;
+                row.append(`<td>${count}</td>`);
+            });
+            table.find('tbody').append(row);
+        });
+
+        // Append the table to the monthlyFiguresTable container and initialize DataTables
+        $('#'+elementName).empty().append(table);
+
+        // Initialize DataTables with horizontal scrolling and paging for 12 columns
+        $('#'+tableId).DataTable({
+            fixedColumns: true,
+            scrollX: true,
+            paging: false,
+            scrollCollapse: true,
+            scrollX: true,
+            searching: false,
+            info: false,
+            drawCallback: function () {
+                setTimeout(function() {
+                    console.log('in here');
+                    // Scroll to the right by default
+                    const tableContainer = $('#'+tableId).parent();
+                    tableContainer.scrollLeft(tableContainer.get(0).scrollWidth);
+                },1000);
+            }
+        });
+    }
 
     function renderCumulativeLineChart(data, chartId) {
         const cumulativeData = {};
