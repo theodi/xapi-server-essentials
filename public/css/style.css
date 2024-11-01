@@ -555,10 +555,12 @@ fieldset .form-group {
 
 .header .logo {
   width: 189px;
-  height: 36px;
-  background-image: url('/images/logo.svg');
+  height: 50px;
+  background-image: url('/images/odilabs-8-dark.svg');
   background-repeat: no-repeat;
   background-size: contain;
+  position: relative;
+  top: -4px;
 }
 
 .flexcontainer {
