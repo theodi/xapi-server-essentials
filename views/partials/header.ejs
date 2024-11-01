@@ -43,7 +43,6 @@
 				<ul>
 				<% if(user) { %>
 					<li><a href="/clients" class="toggle-link <% if (page.link === '/projects') { %>selected<% } %>">Manage clients</a></li>
-					<li><a href="/about" id="privacy-link" class="toggle-link <% if (page.link === '/about') { %>selected<% } %>">Your privacy</a></li>
 					<li>
 						<a style="padding: 0;" class="toggle-link <% if (page.link === '/auth/profile') { %>selected<% } %>" href="/auth/profile"><%= user ? (user.displayName || (user.first_name && user.last_name ? user.first_name + ' ' + user.last_name : user.email)) : 'Guest' %></a>
 						<form style="display: inline-flex;" id="logout_form" action="/logout" method="post">
@@ -51,7 +50,6 @@
 						</form>
 					</li>
 				<% } else { %>
-					<li><a href="/about" id="privacy-link" class="toggle-link <% if (page.link === '/about') { %>selected<% } %>">Your privacy</a></li>
 					<li><a href="/auth/google" class="toggle-link">Login</a></li>
 				<% } %>
 				</ul>
